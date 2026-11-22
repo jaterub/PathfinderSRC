@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='utf-8'?>
+<documenterRetrospectiva version="0.1" fecha="2026-11-19" idioma="es-ES" estado="propuesta-no-canonica" proyectoPiloto="PROFESION" destinoFuturo="OO-Fable-5">
+  <naturaleza>Registro retrospectivo explicativo de decisiones observables y verificables; no es transcripción literal de razonamiento interno, política aprobada ni implementación del agente.</naturaleza>
+  <objetivo>
+    <peticion>Crear una primera propuesta HTML navegable que explique cómo se genera el Radar de PROFESIÓN, cómo se confronta cada oferta con el CV y cómo llega al panel, partiendo de un PNG aportado como fuente.</peticion>
+    <necesidad>Ofrecer a una persona técnica, incluso sin conocer el repositorio, un mapa para localizar cada etapa, su código, los tests y el punto de reparación.</necesidad>
+    <alcanceReal>Primera maqueta documental estática y de solo lectura del flujo del Radar. No es un agente Documenter operativo ni una auditoría completa del proyecto.</alcanceReal>
+    <ambito>El HTML documenta PROFESIÓN; la capacidad reusable de documentación se propondría más adelante al OO mediante revisión y aprobación humana.</ambito>
+  </objetivo>
+  <fuentesYVersiones>
+    <fuente tipo="diagrama-original" archivo="2026-11-14T01_19_22.png" sha256="ee12f9bdc1dfd124066eae66bad8ec8c49f9f47d9568a2eda5fda88e45e7736a">Mapa conceptual de entrada, importación, RAW, descripciones, CV, scorer, reglas, salidas y decisión humana.</fuente>
+    <fuente tipo="html-prototipo" archivo="Profesion_Documenter_Flujo_Radar(1).html" sha256="bea55467e11f4a68321c6fc0427bbf0622352a13c51305d29e90daf9ab3a6688" bytes="31495">Primer prototipo aportado en esta conversación y utilizado para la retrospectiva.</fuente>
+    <fuente tipo="repositorio-piloto" url="https://github.com/jaterub/profesion/tree/60864a8350188924fe110803ebf42c2ad6973872" commit="60864a8350188924fe110803ebf42c2ad6973872">Estado de código señalado por el propio prototipo, que se contrastó durante su construcción.</fuente>
+    <fuente tipo="repositorio-OO" url="https://github.com/jaterub/claude-fable-5/tree/f11798f3e00d6a8a4d9c1544843042fdbef07cb2" commit="f11798f3e00d6a8a4d9c1544843042fdbef07cb2">Normativa y piezas existentes revisadas del OO en main; sin XML ni agente Documenter específico.</fuente>
+  </fuentesYVersiones>
+  <reconstruccionMetodologica clase="sintesis-reproducible" noEs="cadena-de-pensamiento-literal">
+    <decision id="D01">
+      <criterio>Acotar a un flujo mínimo completo antes de cubrir toda la ingeniería</criterio>
+      <motivo>La necesidad inmediata era visualizar el Radar y dar feedback sobre el formato, no desplegar un agente.</motivo>
+      <resultadoEnHTML>10 nodos de flujo desde captación hasta realimentación humana.</resultadoEnHTML>
+    </decision>
+    <decision id="D02">
+      <criterio>Reutilizar el PNG como arquitectura de referencia, sin copiar reglas antiguas</criterio>
+      <motivo>El PNG mostraba el flujo básico, pero la fórmula de puntuación había evolucionado.</motivo>
+      <resultadoEnHTML>Convergencia RAW + descripción + CV; scoring P0.18 vigente.</resultadoEnHTML>
+    </decision>
+    <decision id="D03">
+      <criterio>Separar dos caminos de captación</criterio>
+      <motivo>LinkedIn aporta ofertas y descripciones; Gmail aporta alertas, guardadas y eventos de candidaturas.</motivo>
+      <resultadoEnHTML>Dos cajas de entrada PC local y nube; convergencia de datos.</resultadoEnHTML>
+    </decision>
+    <decision id="D04">
+      <criterio>Hacer visible el contrato de entradas y salidas</criterio>
+      <motivo>Sin ubicar archivos de datos, una persona técnica no puede rastrear un fallo de extremo a extremo.</motivo>
+      <resultadoEnHTML>ofertas_raw.csv, descripciones_api.json, master_cv.md, radar.csv, radar.md, metricas.md, pipeline.csv.</resultadoEnHTML>
+    </decision>
+    <decision id="D05">
+      <criterio>Explicar score y decisión como etapas distintas</criterio>
+      <motivo>Un valor mayor o igual que 60 no garantiza lead: las reglas de modalidad, familia y exclusión tienen prioridad.</motivo>
+      <resultadoEnHTML>Bloque visual de pesos y panel separado de restricciones y decisiones.</resultadoEnHTML>
+    </decision>
+    <decision id="D06">
+      <criterio>Conectar cada bloque con código y test</criterio>
+      <motivo>La utilidad de mantenimiento requiere pasar de qué ocurre a dónde se revisa y cómo se valida.</motivo>
+      <resultadoEnHTML>Inspector interactivo con enlaces a repositorio y tests.</resultadoEnHTML>
+    </decision>
+    <decision id="D07">
+      <criterio>Proponer diagnósticos por síntoma, no solo por archivo</criterio>
+      <motivo>Una persona nueva conoce el síntoma antes de conocer los nombres de los módulos.</motivo>
+      <resultadoEnHTML>Desplegables para oferta ausente, score inesperado, CSV cortado y CI que falla.</resultadoEnHTML>
+    </decision>
+    <decision id="D08">
+      <criterio>Separar automatización productiva de integración continua</criterio>
+      <motivo>El BAT y la tarea diaria no equivalen a los tests que corren con PR.</motivo>
+      <resultadoEnHTML>Secciones de GitHub Actions, tarea programada, check/Kanban y responsabilidades humanas.</resultadoEnHTML>
+    </decision>
+    <decision id="D09">
+      <criterio>Entregar HTML autocontenido y solo lectura</criterio>
+      <motivo>Permite revisarlo localmente sin instalar dependencias ni introducir riesgo sobre datos del proyecto.</motivo>
+      <resultadoEnHTML>HTML + CSS + JavaScript incorporados; no escribe repositorios ni ejecuta procesos.</resultadoEnHTML>
+    </decision>
+    <decision id="D10">
+      <criterio>Mantener una referencia a un commit y a las fuentes</criterio>
+      <motivo>La documentación técnica puede quedar obsoleta cuando main avanza.</motivo>
+      <resultadoEnHTML>Commit de referencia visible en pie y enlaces a rutas GitHub, todavía mayoritariamente apuntando a main.</resultadoEnHTML>
+    </decision>
+  </reconstruccionMetodologica>
+  <modeloDeContenidoDelPrototipo>
+    <nodo id="captura" archivos="2_motor/entrada/ingesta_linkedin_manual.bat; 2_motor/entrada/captura_linkedin.py">LinkedIn: 5 lotes</nodo>
+    <nodo id="gmail" archivos="2_motor/entrada/parse_alert.py; 2_motor/entrada/respuestas.py">Gmail: alertas y candidaturas</nodo>
+    <nodo id="raw" archivos="3_datos/ofertas_raw.csv; 2_motor/entrada/importa_api.py">Datos acumulados de ofertas</nodo>
+    <nodo id="descs" archivos="3_datos/registros/descripciones_api.json">Descripciones completas por ID</nodo>
+    <nodo id="cv" archivos="cv/master_cv.md">Perfil del candidato</nodo>
+    <nodo id="score" archivos="2_motor/radar/score_radar.py">Puntuación comparada con CV y feedback</nodo>
+    <nodo id="reglas" archivos="2_motor/radar/score_radar.py">Ponderación y límites de decisión</nodo>
+    <nodo id="panel" archivos="1_panel/radar.csv; 1_panel/radar.md">Panel del Radar</nodo>
+    <nodo id="metrics" archivos="1_panel/metricas.md">Medición de funcionamiento</nodo>
+    <nodo id="feedback" archivos="1_panel/radar.csv; 1_panel/pipeline.csv">Decisión humana y seguimiento</nodo>
+    <formulaVigente>Tecnologías hasta 45 puntos (mínimo divisor 4) + experiencia hasta 25 + semejanza de decisiones previas hasta 20 + título V1 completo 10/parcial 5/otras familias 0 + salario confirmado &gt;= 60000 EUR suma 10; límite global 100.</formulaVigente>
+    <salida>Nota y decisión lead/revisar/descartar separadas; las reglas duras pueden impedir un lead aunque la nota sea alta.</salida>
+    <cicloHumano>Javier edita ok y razon; el motor relee dichas columnas por URL en la pasada siguiente y la candidatura se sigue separadamente en pipeline.csv.</cicloHumano>
+  </modeloDeContenidoDelPrototipo>
+  <lineaBaseYRegresion>
+    <verificacion id="E01" criterio="Existe un HTML con título explícito" estado="PASS">PROFESIÓN · Documenter — Flujo del Radar</verificacion>
+    <verificacion id="E02" criterio="Hay 10 nodos de flujo seleccionables" estado="PASS">10: captura,gmail,raw,descs,cv,score,reglas,panel,metrics,feedback</verificacion>
+    <verificacion id="E03" criterio="Hay 9 desplegables de ayuda y gobierno" estado="PASS">9 elementos HTML details</verificacion>
+    <verificacion id="E04" criterio="La maqueta tiene enlaces de fuentes" estado="PASS">21 enlaces HTML estáticos; se añaden enlaces en tiempo de ejecución mediante JS</verificacion>
+    <verificacion id="E05" criterio="JavaScript sintácticamente válido" estado="PASS">node --check sobre script extraído, código de salida 0</verificacion>
+    <verificacion id="E06" criterio="No incluye enlaces externos fuera de GitHub" estado="PASS">No detectados en los enlaces HTML estáticos</verificacion>
+    <verificacion id="E07" criterio="Las rutas y anclajes a líneas de GitHub resuelven todos" estado="SIN_VERIFICAR">Pendiente de verificar para cada enlace y SHA</verificacion>
+    <verificacion id="E08" criterio="Interacciones comprobadas en navegador (selección, responsive, accesibilidad)" estado="SIN_VERIFICAR">No consta prueba automatizada de navegador en esta retrospectiva</verificacion>
+    <verificacion id="E09" criterio="La documentación refleja la ejecución real de mañana" estado="NO_APLICA">No: la tarea real y la integración externa no se han ejecutado mediante el HTML</verificacion>
+    <verificacion id="E10" criterio="Existe un agente Documenter ejecutando esta generación" estado="NO_APLICA">No: HTML confeccionado como prototipo, sin agente de OO instalado</verificacion>
+    <controlRepetible>Mantener fichero HTML, SHA256, lista de nodos y desplegables; validar sintaxis JS, enlaces, correspondencia con código fuente y regresiones tras cada iteración. No dar PASS a rutas no comprobadas.</controlRepetible>
+  </lineaBaseYRegresion>
+  <estadoDelOO referencia="main" sha="f11798f3e00d6a8a4d9c1544843042fdbef07cb2">
+    <inventario>No se han encontrado archivos .xml en main ni ficha agentic-loop/agents/documenter.md ni definición Documenter en el árbol actual.</inventario>
+    <contratos>Existe agentic-loop/contracts/v1.json, en JSON; no constituye un contrato XML de Documenter.</contratos>
+    <reglaExistente archivo="normas.md">Gobierno en niveles: pri/OO/proyecto; fuente única por tema; aprobación humana para modificar normas, repositorios o integrar main.</reglaExistente>
+    <reglaExistente archivo="agentic-loop/CLAUDE.md">Triaje por complejidad; leer estado real; construir, verificar, criticar y entregar; dejar evidencia y no declarar éxito sin comprobar.</reglaExistente>
+    <reglaExistente archivo="agentic-loop/README.md">La plantilla del OO se traslada al proyecto; el manual y agentes no se editan en el cliente; reimportación controlada.</reglaExistente>
+    <reglaExistente archivo="agentic-loop/AGENTS.md">Minimizar código; revisar puntos de impacto; toda lógica nueva no trivial requiere test.</reglaExistente>
+    <reglaExistente archivo="agentic-loop/agents/verifier.md">Contrastar fuentes, ejecutar tests y marcar lo no verificable. Exigir evidencia reproducible.</reglaExistente>
+    <reglaExistente archivo="agentic-loop/agents/critic.md">Juzgar entregable contra criterios de aceptación y registrar hallazgos con localización exacta.</reglaExistente>
+    <reglaExistente archivo="docs/architecture/blueprint.md">Trazabilidad entre decisión, requisito, control, artefacto, prueba y evidencia; distinguir diseño de política operativa.</reglaExistente>
+    <inconsistenciaDetectada>El manual del orquestador sitúa Verifier antes de Critic, mientras el encabezado de verifier.md describe un entregable previamente aprobado por Critic. Documenter no debe convertir esa divergencia en norma; requiere revisión posterior.</inconsistenciaDetectada>
+    <estatusDocumenter>Capacidad propuesta. No está implementada, versionada ni autorizada como agente del OO a fecha de esta revisión.</estatusDocumenter>
+  </estadoDelOO>
+  <especificacionCandidataDocumenter aprobacion="pendiente" objetivo="promover-si-el-piloto-funciona">
+    <rol>Generar mapas técnicos navegables y documentación de diagnóstico trazable desde fuentes reales de un repositorio y, cuando exista, del entorno de ejecución.</rol>
+    <entrada>Solicitud concreta, repositorio y SHA, contexto canónico del proyecto, normas OO aplicables, diagrama de referencia opcional, fuentes de código, tests, workflows y registros accesibles.</entrada>
+    <procedimiento>1) Confirmar fuentes y versión; 2) identificar recorrido de datos, control y responsabilidades; 3) separar hechos de interpretaciones y huecos; 4) enlazar cada etapa con archivo, función, test y ejecución cuando sea comprobable; 5) generar HTML autocontenido con inspector y diagnóstico; 6) ejecutar validación técnica; 7) solicitar revisión humana.</procedimiento>
+    <salida>Un HTML local navegable, más una ficha de fuentes y resultados verificables. El XML retrospectivo sirve como semilla de especificación, no como formato operativo obligatorio.</salida>
+    <criterioPorSeccion>propósito -&gt; entrada -&gt; transformaciones -&gt; salida -&gt; archivo/función -&gt; test -&gt; automatización -&gt; evidencia -&gt; diagnóstico -&gt; límite de verificación</criterioPorSeccion>
+    <ubicacionTentativa>Si se aprueba, proponer en OO agentic-loop/agents/documenter.md y reglas mínimas de invocación desde el orquestador; NO crear ni copiar automáticamente en PROFESIÓN todavía.</ubicacionTentativa>
+    <puntoInsercionTentativo>Tras la verificación objetiva y la crítica, antes del cierre/entrega, con modo intermedio bajo solicitud; sujeto a una decisión explícita de arquitectura.</puntoInsercionTentativo>
+    <prohibiciones>No inventar rutas, resultados de tests, estado de Kanban ni programación efectiva. No sustituir evidencia por el contenido del HTML. No autoaprobar PR, no fusionar, no tocar secretos o datos privados.</prohibiciones>
+    <planDeRegresion>Al promocionar: test XML/estructura de insumos si se adopta contrato; test de generación HTML; enlaces y fuente fijados por SHA; controles de accesibilidad; revisión de contenido por Verifier; feedback del usuario y PR independiente al OO.</planDeRegresion>
+    <preguntasAbiertas>Qué formato de entrada adoptará Documenter (JSON ya existente, XML solo descriptivo u otro); cuándo invocarlo; quién aprueba el entregable; qué verificaciones necesitan entorno real; cómo marcar discrepancias entre README, contexto y workflows.</preguntasAbiertas>
+  </especificacionCandidataDocumenter>
+  <siguienteAccion>Javier revisa el HTML y esta retrospectiva como materiales fuente en PROFESIÓN. No subir al OO, cambiar check, crear agente ni fusionar sin autorización específica.</siguienteAccion>
+</documenterRetrospectiva>

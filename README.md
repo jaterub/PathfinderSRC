@@ -1,8 +1,8 @@
 # TrackRadar
 
-[![Documenter · Del anuncio al Radar: mapa visual de las diez etapas](./docs/documenter/portada-radar.svg)](https://jaterub.github.io/Pathfinder/)
+[![Documenter · Del anuncio al Radar: mapa visual de las diez etapas](./docs/documenter/portada-radar.svg)](./docs/documenter/flujo-radar.html)
 
-**Documenter:** mapa de captación, evaluación y decisiones. [Explorar el HTML interactivo](./docs/documenter/flujo-radar.html) (abrir fuera del visor de código de GitHub; publicación web pendiente) · [Ver código del motor](./2_motor/radar/score_radar.py).
+**Documenter:** mapa de captación, evaluación y decisiones. [Explorar el HTML interactivo](./docs/documenter/flujo-radar.html) (descargar y abrir en el navegador; publicación web pendiente) · [Ver código del motor](./2_motor/radar/score_radar.py).
 
 ## Documenter · recorrido explicado
 

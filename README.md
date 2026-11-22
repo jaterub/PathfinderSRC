@@ -1,5 +1,3 @@
-# PathfinderSRC# Pathfinder
-AI-powered app revolving around your new professional focal point.
 # TrackRadar
 
 [![Documenter · Del anuncio al Radar: mapa visual de las diez etapas](./docs/documenter/portada-radar.svg)](https://jaterub.github.io/Pathfinder/)

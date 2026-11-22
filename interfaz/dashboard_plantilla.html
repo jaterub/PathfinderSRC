@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Radar · vista de usuario</title>
+<style>
+  :root { --bg:#f4f6fb; --card:#fff; --ink:#1f2433; --mute:#6b7285; --line:#e6e9f2; --acc:#4f46e5; --acc2:#eef0ff;
+          --ok:#12925a; --okbg:#e6f6ee; --warn:#b86e00; --warnbg:#fff3df; --ko:#d13c3c; --kobg:#fdeaea; --cold:#5b6b8c; --coldbg:#eef1f6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:linear-gradient(135deg,#4f46e5 0%,#7c5cf0 60%,#a78bfa 100%); color:#fff; }
+  .wrap { max-width:1180px; margin:auto; padding:0 24px; }
+  header .wrap { padding-top:22px; }
+  h1 { font-size:22px; margin:0 0 4px; } .sub { opacity:.85; font-size:13px; }
+  nav { display:flex; gap:4px; margin-top:16px; }
+  nav button { border:0; background:none; padding:10px 16px; font:inherit; color:rgba(255,255,255,.8); cursor:pointer; border-radius:10px 10px 0 0; }
+  nav button.on { background:var(--bg); color:var(--ink); font-weight:600; }
+  main { padding:22px 24px 60px; max-width:1180px; margin:auto; }
+  section { display:none; } section.on { display:block; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:22px; }
+  .kpi { background:var(--card); border-radius:14px; padding:14px 16px; box-shadow:0 1px 2px rgba(31,36,51,.06),0 4px 14px rgba(31,36,51,.05); border-top:4px solid var(--acc); }
+  .kpi b { display:block; font-size:26px; } .kpi span { color:var(--mute); font-size:12px; }
+  .kpi.verde { border-color:var(--ok); } .kpi.ambar { border-color:var(--warn); } .kpi.rojo { border-color:var(--ko); } .kpi.lila { border-color:#a78bfa; }
+  .card { background:var(--card); border-radius:14px; padding:18px; margin-bottom:20px; box-shadow:0 1px 2px rgba(31,36,51,.06),0 4px 14px rgba(31,36,51,.05); }
+  .card h2 { font-size:15px; margin:0 0 12px; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th, td { text-align:left; padding:8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tbody tr:hover { background:#fafbff; }
+  th { color:var(--mute); font-weight:500; cursor:pointer; user-select:none; white-space:nowrap; font-size:12.5px; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+  a { color:var(--acc); text-decoration:none; font-weight:500; } a:hover { text-decoration:underline; }
+  .pill { display:inline-block; padding:2px 9px; border-radius:99px; font-size:12px; font-weight:500; background:var(--acc2); color:var(--acc); }
+  .lead, .vivo { background:var(--okbg); color:var(--ok); } .revisar, .tibio { background:var(--warnbg); color:var(--warn); }
+  .descartar { background:var(--kobg); color:var(--ko); } .frío { background:var(--coldbg); color:var(--cold); }
+  .tools { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  input, textarea, select { font:inherit; color:inherit; background:#fff; border:1px solid var(--line); border-radius:9px; padding:7px 10px; }
+  input:focus, textarea:focus, select:focus { outline:2px solid var(--acc2); border-color:var(--acc); }
+  td select { padding:4px 6px; } td input.razon { width:100%; min-width:140px; padding:5px 8px; }
+  tr.decidida td { background:#f3fbf6; }
+  textarea { width:100%; min-height:70px; }
+  .bar { display:grid; grid-template-columns:170px 1fr 60px; gap:10px; align-items:center; margin:7px 0; font-size:13.5px; }
+  .bar i { display:block; height:10px; border-radius:6px; background:linear-gradient(90deg,#4f46e5,#a78bfa); }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px; }
+  .drop { border:2px dashed #c9cdf5; border-radius:12px; padding:26px; text-align:center; color:var(--mute); cursor:pointer; background:#fafbff; }
+  .drop.over { border-color:var(--acc); color:var(--acc); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; } .chip { padding:2px 9px; border-radius:99px; background:var(--acc2); font-size:12.5px; }
+  .mute { color:var(--mute); font-size:12.5px; } .vacio { color:var(--mute); padding:12px 0; }
+  button.btn { font:inherit; border:0; background:var(--acc); color:#fff; border-radius:9px; padding:8px 14px; cursor:pointer; font-weight:500; }
+  button.btn.sec { background:var(--acc2); color:var(--acc); }
+  .funnel { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .funnel div { flex:1; min-width:100px; background:var(--acc2); border-radius:12px; padding:10px; text-align:center; color:var(--mute); font-size:12.5px; }
+  .funnel b { display:block; font-size:22px; color:var(--acc); }
+  .cambios { font-size:12.5px; color:var(--ok); font-weight:500; }
+  .barra { position:sticky; top:0; z-index:5; background:rgba(255,255,255,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  .barra .wrap { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding-top:10px; padding-bottom:10px; }
+  .barra .ayuda { margin-left:auto; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Radar de empleo · vista de usuario</h1>
+  <div class="sub" id="sub"></div>
+  <nav>
+    <button data-tab="dia" class="on">Mi día</button>
+    <button data-tab="rumbo">Mi rumbo</button>
+    <button data-tab="perfil">Mi perfil</button>
+  </nav>
+</div></header>
+<div class="barra"><div class="wrap">
+  <button class="btn" id="guardar">Guardar mis decisiones</button><button class="btn sec" id="limpiar">Deshacer cambios</button>
+  <span class="cambios" id="ncambios"></span>
+  <span class="mute ayuda" id="destino"></span>
+</div></div>
+<main>
+  <section id="dia" class="on">
+    <div class="kpis" id="kpis"></div>
+    <div class="card"><h2>⭐ Mejores nuevas de hoy</h2><div id="mejores"></div></div>
+    <div class="card">
+      <h2>👉 Pendientes de tu decisión</h2>
+      <div class="tools"><input type="search" id="q" placeholder="Buscar empresa o rol…"><select id="fdec"><option value="">Todas</option><option>lead</option><option>revisar</option></select></div>
+      <div id="pendientes"></div>
+    </div>
+    <div class="card"><h2>✅ Decididas <span class="mute" id="ndecididas"></span></h2><div id="decididas"></div>
+      <div class="mute">Puedes seguir cambiando el ok o la razón. Si vuelves a poner «—», la oferta regresa a pendientes.</div></div>
+  </section>
+
+  <section id="rumbo">
+    <div class="card">
+      <h2>🧭 Tus candidaturas: lo que se está moviendo</h2>
+      <div class="funnel" id="funnel"></div>
+      <div id="vivas"></div>
+      <div class="mute" id="vivas_nota" style="margin-top:8px"></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>📚 Qué estudiar</h2><div class="mute" id="estudiar_sub"></div><div id="estudiar"></div></div>
+      <div class="card"><h2>🎯 Puestos a futuro de hoy</h2><div id="futuro_hoy"></div></div>
+    </div>
+  </section>
+
+  <section id="perfil">
+    <div class="card">
+      <h2>🔑 Conexión con GitHub</h2>
+      <div class="mute" style="margin-bottom:10px">Con tu llave, «Guardar mis decisiones» las escribe en <code>1_panel/decisiones/</code> del repo y la siguiente pasada las aplica. Sin llave, se descarga el archivo. La llave se queda solo en este navegador.</div>
+      <div class="tools"><input type="password" id="token" placeholder="github_pat_…" style="min-width:320px"><button class="btn sec" id="token_guardar">Guardar llave</button><button class="btn sec" id="token_borrar">Borrar llave</button><span class="mute" id="token_estado"></span></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>📄 Tu CV</h2>
+        <div class="drop" id="drop">Suelta aquí tu CV (.txt o .md) o haz clic para elegirlo.<br><span class="mute">Se lee solo en tu navegador: no se sube a ningún sitio.</span></div>
+        <input type="file" id="file" accept=".txt,.md,.pdf,.docx" hidden>
+        <div id="cvinfo" class="mute" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h2>🎯 Adónde quieres llegar</h2>
+        <textarea id="objetivo" placeholder="Ej.: objetivo profesional, plazo, ubicación y modalidad deseada"></textarea>
+        <div class="tools" style="margin-top:10px">
+          <label>Salario mínimo <input type="number" id="salario" step="1000"></label>
+          <label>Años máx. pedidos <input type="number" id="anos"></label>
+          <label>Corte de lead <input type="number" id="corte"></label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🧭 Tus listas de competencias</h2>
+      <div class="mute" style="margin-bottom:10px">Rumbo suma aunque no esté en tu CV · base suma la mitad · resta es lo que quieres dejar atrás · neutro solo se detecta. Una por línea.</div>
+      <div class="grid2" id="listas" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))"></div>
+      <div class="tools" style="margin-top:12px"><button class="btn sec" id="exportar">Descargar perfil (JSON)</button><span class="mute" id="guardado"></span></div>
+      <div class="mute">Piloto (P6.7): el motor todavía lee estas listas de su código; este perfil será su entrada cuando llegue P6.1.</div>
+    </div>
+  </section>
+</main>
+<script>
+const D = /*__DATOS__*/null;
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pill = (d) => `<span class="pill ${esc(d)}">${esc(d)}</span>`;
+const link = (u) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener">abrir ↗</a>` : "";
+const mem = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
+              set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } } };
+
+// ---- decisiones marcadas en el panel (url -> {ok, razon}) ----
+const KEY = "radar_decisiones";
+let refrescar = null;
+let marcas = mem.get(KEY, {});
+if (D) {   // lo que ya aplicó la pasada (ya no está pendiente o ya trae tu ok) deja de contar como marca sin guardar
+  const pend = new Set(D.pendientes.map((o) => o.url)), okDe = Object.fromEntries(D.mejores.map((o) => [o.url, o.ok || ""]));
+  for (const [u, m] of Object.entries(marcas)) if (!pend.has(u) && (!(u in okDe) || okDe[u] === m.ok)) delete marcas[u];
+  mem.set(KEY, marcas);
+}
+const OKS = ["", "si", "no", "futuro", "espera"];
+function contar() {
+  const v = Object.values(marcas), sin = v.filter((m) => !m.guardada).length, ya = v.length - sin;
+  $("#ncambios").textContent = [sin ? `${sin} sin guardar` : "", ya ? `${ya} guardada(s): se aplican en la próxima pasada` : ""].filter(Boolean).join(" · ");
+}
+const llave = () => mem.get("radar_token", "");
+function pintaDestino() { $("#destino").textContent = llave() ? `Guarda en GitHub (${D.repo})` : "Sin llave: se descarga el archivo (configúrala en Mi perfil)"; }
+function marcar(url, campo, valor) {
+  const m = marcas[url] || { ok: "", razon: "" };
+  m[campo] = valor; m.guardada = false;
+  if (!m.ok && !m.razon) delete marcas[url]; else marcas[url] = m;
+  mem.set(KEY, marcas); contar();
+}
+function controles(o) {
+  const m = marcas[o.url] || { ok: o.ok || "", razon: "" };
+  return [{ h: `<select data-url="${esc(o.url)}" data-c="ok">${OKS.map((k) => `<option value="${k}"${k === m.ok ? " selected" : ""}>${k || "—"}</option>`).join("")}</select>`, v: m.ok },
+          { h: `<input class="razon" data-url="${esc(o.url)}" data-c="razon" value="${esc(m.razon)}" placeholder="por qué (opcional)">`, v: m.razon }];
+}
+function enganchar(el) {
+  el.querySelectorAll("[data-c]").forEach((x) => {
+    const ev = x.tagName === "SELECT" ? "change" : "input";
+    x.addEventListener(ev, () => {
+      marcar(x.dataset.url, x.dataset.c, x.value);
+      x.closest("tr").classList.toggle("decidida", !!marcas[x.dataset.url]);
+      if (x.dataset.c === "ok" && typeof refrescar === "function") refrescar();   // la razón no repinta: no se pierde el foco al escribir
+    });
+  });
+  el.querySelectorAll("[data-c=ok]").forEach((x) => { if (marcas[x.dataset.url]) x.closest("tr").classList.add("decidida"); });
+}
+
+function tabla(cols, filas, vacio) {
+  if (!filas.length) return `<div class="vacio">${vacio || "Nada por aquí."}</div>`;
+  const wrap = document.createElement("div");
+  let orden = { i: -1, asc: true };
+  const pinta = () => {
+    const f = filas.slice();
+    if (orden.i >= 0) f.sort((a, b) => { const x = a[orden.i].v, y = b[orden.i].v; return (x > y ? 1 : x < y ? -1 : 0) * (orden.asc ? 1 : -1); });
+    wrap.innerHTML = `<table><thead><tr>${cols.map((c, i) => `<th data-i="${i}">${c}</th>`).join("")}</tr></thead><tbody>${
+      f.map((r) => `<tr>${r.map((c) => `<td class="${c.cls || ""}">${c.h}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    wrap.querySelectorAll("th").forEach((th) => th.onclick = () => { const i = +th.dataset.i; orden = { i, asc: orden.i === i ? !orden.asc : false }; pinta(); });
+    enganchar(wrap);
+  };
+  pinta();
+  return wrap;
+}
+const put = (sel, x) => { const el = $(sel); el.innerHTML = ""; typeof x === "string" ? el.innerHTML = x : el.appendChild(x); };
+const celda = (h, v, cls) => ({ h, v: v ?? h, cls });
+const filaOferta = (o) => [celda(o.nota, o.nota, "num"), celda(pill(o.decision), o.decision), celda(`<b>${esc(o.empresa)}</b><br><span class="mute">${esc(o.rol)}</span>`, o.empresa),
+  celda(esc(String(o.encaje_tec).replace(" out ", " de ")), o.encaje_tec), celda(esc(o.salario), String(o.salario)), celda(esc(o.modalidad), o.modalidad), celda(link(o.url), "")]
+  .concat(controles(o));
+const COLS = ["Nota", "Decisión", "Empresa · rol", "Encaje", "Salario", "Modalidad", "", "Tu ok", "Razón"];
+
+function mostrarDia() {
+  const r = D.resumen, color = { ROJO: "rojo", VERDE: "verde", GRIS: "" }[D.semaforo] || "";
+  $("#kpis").innerHTML = [["Nuevas hoy", r.nuevas, ""], ["API", r.nuevas_api, ""], ["Gmail", r.nuevas_email, ""], ["Lead", r.lead, "verde"], ["Revisar", r.revisar, "ambar"],
+    ["🎯 A futuro", r.a_futuro, "lila"], ["Pendientes", r.pendientes, "ambar", "kpi_pend"], ["Semáforo", D.semaforo, color]]
+    .map(([t, v, c, id]) => `<div class="kpi ${c}"><b${id ? ` id="${id}"` : ""}>${esc(v)}</b><span>${t}</span></div>`).join("");
+  const pintaMejores = () => put("#mejores", tabla(COLS, D.mejores.map(filaOferta), "Hoy no hay nuevas por encima de descartar."));
+  const decidida = (o) => !!(marcas[o.url] && marcas[o.url].ok);
+  const filtra = () => {
+    const q = $("#q").value.toLowerCase(), d = $("#fdec").value;
+    put("#pendientes", tabla(COLS, D.pendientes.filter((o) => !decidida(o) && (!d || o.decision === d) && (o.empresa + " " + o.rol).toLowerCase().includes(q)).map(filaOferta), "No tienes nada pendiente."));
+    const hechas = D.pendientes.filter(decidida);
+    $("#ndecididas").textContent = hechas.length ? `(${hechas.length})` : "";
+    put("#decididas", tabla(COLS, hechas.map(filaOferta), "Aún no has decidido ninguna en esta sesión."));
+    $("#kpi_pend").textContent = D.pendientes.length - hechas.length;
+  };
+  refrescar = () => { pintaMejores(); filtra(); };
+  $("#q").oninput = filtra; $("#fdec").onchange = filtra; pintaMejores(); filtra();
+  $("#guardar").onclick = async () => {
+    const filas = Object.entries(marcas).filter(([, m]) => !m.guardada);
+    if (!filas.length) { $("#ncambios").textContent = "No hay nada nuevo que guardar."; return; }
+    const q = (t) => `"${String(t).replace(/"/g, '""')}"`;
+    const csv = "url,ok,razon\n" + filas.map(([u, m]) => [u, m.ok, m.razon].map(q).join(",")).join("\n") + "\n";
+    const ahora = new Date(), sello = ahora.toISOString().slice(0, 19).replace(/[-:T]/g, "").replace(/^(\d{8})/, "$1_");
+    const nombre = `decisiones_${sello}.csv`;
+    const hecho = () => { filas.forEach(([u]) => marcas[u].guardada = true); mem.set(KEY, marcas); contar(); };
+    if (!llave()) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv" }));
+      a.download = nombre; a.click(); hecho(); return;
+    }
+    $("#ncambios").textContent = "Guardando en GitHub…";
+    try {
+      const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(csv)));
+      const r = await fetch(`https://api.github.com/repos/${D.repo}/contents/1_panel/decisiones/${nombre}`, {
+        method: "PUT", headers: { Authorization: "Bearer " + llave(), Accept: "application/vnd.github+json" },
+        body: JSON.stringify({ message: `Decisiones desde el dashboard (${filas.length})`, content: b64, branch: "main" }) });
+      if (!r.ok) throw new Error(`${r.status} ${(await r.json().catch(() => ({}))).message || ""}`);
+      hecho();
+    } catch (e) {
+      $("#ncambios").textContent = `No se pudo guardar en GitHub (${e.message}). Tus marcas siguen aquí; revisa la llave o vuelve a intentarlo.`;
+    }
+  };
+  $("#limpiar").onclick = () => { marcas = {}; mem.set(KEY, marcas); contar(); pintaMejores(); filtra(); };
+  contar();
+}
+
+// Candidaturas: primero lo que se ha movido hace poco, no lo más avanzado (una entrevista de hace un mes ya está fría).
+const ETAPA = { aplicada: 1, respuesta: 2, entrevista: 3, oferta: 4 };
+function mostrarRumbo() {
+  const f = D.funnel;
+  $("#funnel").innerHTML = f.etapas.filter((e) => e.etapa !== "cerrada").map((e) => `<div><b>${e.candidaturas}</b>${esc(e.etapa)}</div>`).join("");
+  const vivas = f.vivas.slice().sort((a, b) => (a.dias_sin_mov ?? 999) - (b.dias_sin_mov ?? 999) || (ETAPA[b.etapa] || 0) - (ETAPA[a.etapa] || 0));
+  const diez = vivas.slice(0, 10);
+  put("#vivas", tabla(["Estado", "Etapa", "Empresa · rol", "Aplicada", "Última novedad", "Sin moverse", ""], diez.map((v) => [
+    celda(pill(v.estado), v.dias_sin_mov ?? 999), celda(pill(v.etapa), ETAPA[v.etapa] || 0),
+    celda(`<b>${esc(v.empresa)}</b><br><span class="mute">${esc(v.rol)}</span>`, v.empresa),
+    celda(esc(v.aplicada || "—"), v.aplicada), celda(`${esc(v.ultima || "—")} · ${esc(v.ultima_fecha || "n/d")}`, v.ultima_fecha),
+    celda(v.dias_sin_mov == null ? "n/d" : `${v.dias_sin_mov} días`, v.dias_sin_mov ?? 999, "num"), celda(link(v.url), "")]), "Aún no has aplicado a ninguna."));
+  const frias = vivas.filter((v) => v.estado === "frío").length;
+  $("#vivas_nota").textContent = `Ordenadas por la novedad más reciente. Se ven ${diez.length} de ${vivas.length} candidaturas abiertas` +
+    (frias ? ` · ${frias} llevan más de 20 días sin moverse (a los 30 se cierran solas)` : "") +
+    ` · ${f.leads_sin_aplicar} leads aún sin aplicar.`;
+  const fu = D.a_futuro, max = Math.max(1, ...fu.estudiar.map((e) => e.ofertas));
+  $("#estudiar_sub").textContent = `Tecnologías que te faltan en los ${fu.total} puestos a futuro.`;
+  put("#estudiar", fu.estudiar.length ? fu.estudiar.map((e) => `<div class="bar"><span>${esc(e.tecnologia)}</span><i style="width:${100 * e.ofertas / max}%"></i><span class="mute">${e.ofertas}/${fu.total}</span></div>`).join("") : '<div class="vacio">Sin datos todavía.</div>');
+  put("#futuro_hoy", tabla(["Nota", "Empresa · rol", "Te falta", ""], fu.hoy.map((o) => [celda(o.nota, o.nota, "num"), celda(`<b>${esc(o.empresa)}</b><br><span class="mute">${esc(o.rol)}</span>`, o.empresa),
+    celda(esc((o.faltan || []).join(", ") || "años"), ""), celda(link(o.url), "")]), "Hoy no entró ninguna."));
+}
+
+const LISTAS = [["rumbo", "🧭 Rumbo (suma)"], ["base", "📦 Base (mitad)"], ["resta", "⛔ Resta"], ["neutro", "· Neutro"]];
+function mostrarPerfil() {
+  const p = Object.assign({}, D.perfil || {}, mem.get("radar_perfil", {}));
+  $("#objetivo").value = p.objetivo || ""; $("#salario").value = p.salario_min ?? ""; $("#anos").value = p.anos_max ?? ""; $("#corte").value = p.corte_lead ?? "";
+  $("#listas").innerHTML = LISTAS.map(([k, t]) => `<div><b>${t}</b><textarea data-k="${k}" rows="8">${esc((p[k] || []).join("\n"))}</textarea></div>`).join("");
+  const leer = () => {
+    const out = { objetivo: $("#objetivo").value, salario_min: +$("#salario").value || null, anos_max: +$("#anos").value || null, corte_lead: +$("#corte").value || null };
+    document.querySelectorAll("#listas textarea").forEach((t) => out[t.dataset.k] = t.value.split("\n").map((x) => x.trim()).filter(Boolean));
+    return out;
+  };
+  document.querySelectorAll("#perfil textarea, #perfil input[type=number]").forEach((el) => el.onchange = () =>
+    $("#guardado").textContent = mem.set("radar_perfil", leer()) ? "Guardado en este navegador." : "Este navegador no deja guardar: descarga el perfil.");
+  $("#exportar").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(leer(), null, 1)], { type: "application/json" })); a.download = "perfil.json"; a.click(); };
+  const drop = $("#drop"), file = $("#file");
+  const usar = (f) => {
+    if (!f) return;
+    const info = `${esc(f.name)} · ${(f.size / 1024).toFixed(0)} KB`;
+    if (/\.(txt|md)$/i.test(f.name)) {
+      f.text().then((t) => {
+        const todas = LISTAS.flatMap(([k]) => (leer()[k] || []).map((x) => [k, x]));
+        const tiene = todas.filter(([, x]) => t.toLowerCase().includes(x.toLowerCase()));
+        $("#cvinfo").innerHTML = `${info}<br>En tu CV aparecen ${tiene.length} de ${todas.length} competencias de tus listas:<div class="chips" style="margin-top:6px">${tiene.map(([, x]) => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
+      });
+    } else {
+      $("#cvinfo").innerHTML = `${info}<br>Por ahora solo leo .txt o .md en el navegador; PDF y Word llegarán con el onboarding (P6.2).`;
+    }
+  };
+  drop.onclick = () => file.click(); file.onchange = () => usar(file.files[0]);
+  drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("over"); };
+  drop.ondragleave = () => drop.classList.remove("over");
+  drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("over"); usar(e.dataTransfer.files[0]); };
+}
+
+document.querySelectorAll("nav button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll("nav button, section").forEach((x) => x.classList.remove("on"));
+  b.classList.add("on"); $("#" + b.dataset.tab).classList.add("on");
+});
+if (!D) {
+  document.querySelector("main").innerHTML = '<div class="card">Sin datos: este archivo lo rellena el motor (<code>score_radar.py</code>) en cada pasada.</div>';
+} else {
+  $("#sub").textContent = `Datos de la pasada del ${D.fecha} · ${D.resumen.radar_total} ofertas en el radar`;
+  mostrarDia(); mostrarRumbo(); mostrarPerfil();
+  const estadoLlave = () => { $("#token_estado").textContent = llave() ? "Llave guardada en este navegador." : "Sin llave."; pintaDestino(); };
+  $("#token_guardar").onclick = () => { const t = $("#token").value.trim(); if (t) mem.set("radar_token", t); $("#token").value = ""; estadoLlave(); };
+  $("#token_borrar").onclick = () => { try { localStorage.removeItem("radar_token"); } catch (e) {} estadoLlave(); };
+  estadoLlave();
+}
+</script>
+</body>
+</html>

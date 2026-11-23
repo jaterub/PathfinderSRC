@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1290" viewBox="0 0 1600 1290" role="img" aria-labelledby="title desc">
+<title id="title">PROFESIÓN · Documenter — Del anuncio al Radar</title>
+<desc id="desc">Arquitectura del Radar de empleo en diez etapas: captación LinkedIn y Gmail, preparación de RAW, descripciones y CV, evaluación por score_radar, reglas, clasificación lead/revisar/descartar, panel, métricas y realimentación humana.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#081725"/><stop offset="0.47" stop-color="#0A1A2C"/><stop offset="1" stop-color="#06121E"/></linearGradient>
+  <radialGradient id="aura"><stop offset="0" stop-color="#176493" stop-opacity=".35"/><stop offset="1" stop-color="#176493" stop-opacity="0"/></radialGradient>
+  <radialGradient id="auraGreen"><stop offset="0" stop-color="#0C7C71" stop-opacity=".26"/><stop offset="1" stop-color="#0C7C71" stop-opacity="0"/></radialGradient>
+  <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#153752"/><stop offset="1" stop-color="#102537"/></linearGradient>
+  <linearGradient id="panelGreen" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#12424B"/><stop offset="1" stop-color="#12333E"/></linearGradient>
+  <linearGradient id="panelPurple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2A3556"/><stop offset="1" stop-color="#1E2A43"/></linearGradient>
+  <linearGradient id="panelAmber" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4C3C2A"/><stop offset="1" stop-color="#322B29"/></linearGradient>
+  <linearGradient id="lead" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123A37"/><stop offset="1" stop-color="#112A32"/></linearGradient>
+  <linearGradient id="review" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#493924"/><stop offset="1" stop-color="#2D2930"/></linearGradient>
+  <linearGradient id="reject" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#412937"/><stop offset="1" stop-color="#282632"/></linearGradient>
+  <filter id="shadow" x="-12%" y="-25%" width="130%" height="160%"><feDropShadow dx="0" dy="9" stdDeviation="12" flood-color="#000" flood-opacity="0.21"/></filter>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9 Z" fill="#638FA9"/></marker>
+  <pattern id="dots" patternUnits="userSpaceOnUse" width="28" height="28"><circle cx="2" cy="2" r="1" fill="#497A99" opacity=".13"/></pattern>
+</defs>
+<rect width="1600" height="1290" fill="url(#bg)"/>
+<ellipse cx="155" cy="120" rx="620" ry="410" fill="url(#aura)"/>
+<ellipse cx="1460" cy="520" rx="640" ry="600" fill="url(#auraGreen)"/>
+<rect width="1600" height="1290" fill="url(#dots)"/>
+<rect x="26" y="26" width="1548" height="1238" rx="27" fill="none" stroke="#2C4B65" stroke-width="1.5"/>
+<rect x="94" y="62" width="46" height="46" rx="12" fill="#57BAFF" stroke="#57BAFF" stroke-width="1" />
+<text x="117" y="94" font-size="29" fill="#061723" font-weight="900" text-anchor="middle">P</text>
+<text x="156" y="93" font-size="23" fill="#E4F5FF" font-weight="860" letter-spacing="1.4">PROFESIÓN</text>
+<text x="323" y="93" font-size="19" fill="#63C5FA" font-weight="800" letter-spacing="1.8">/  DOCUMENTER</text>
+<rect x="1238" y="66" width="265" height="35" rx="18" fill="#12364A" stroke="#27657D" stroke-width="1" />
+<text x="1370" y="90" font-size="15" fill="#78D6DD" font-weight="800" letter-spacing="1.2" text-anchor="middle">MAPA TÉCNICO · V1</text>
+<text x="95" y="166" font-size="62" fill="#F2FAFF" font-weight="820" letter-spacing="-2">Del anuncio al Radar.</text>
+<text x="97" y="201" font-size="22" fill="#AFC9DA" font-weight="440">Flujo de extremo a extremo · fuentes, puntuación, decisiones y trazabilidad</text>
+<text x="96" y="247" font-size="16" fill="#88B3CE" font-weight="800" letter-spacing="3">A / CAPTACIÓN</text>
+<path d="M96 259 H1504" fill="none" stroke="#264057" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<rect x="95" y="264" width="673" height="111" rx="18" fill="url(#panel)" stroke="#315675" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="96" y="281" width="5" height="77" rx="2.5" fill="#6EC7FF"/>
+<rect x="121" y="288" width="53" height="41" rx="11" fill="#152E43" stroke="#315675" stroke-width="1.2" />
+<text x="147" y="316" font-size="19" fill="#6EC7FF" font-weight="800" text-anchor="middle">01</text>
+<text x="189" y="319" font-size="26" fill="#F4FAFF" font-weight="740">LinkedIn · cinco lotes</text>
+<text x="124" y="351" font-size="18" fill="#B2C9D9" font-weight="450">PC local  ·  BAT · Python · JSON</text>
+<rect x="833" y="264" width="672" height="111" rx="18" fill="url(#panelGreen)" stroke="#267B77" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="834" y="281" width="5" height="77" rx="2.5" fill="#58E0CA"/>
+<rect x="859" y="288" width="53" height="41" rx="11" fill="#152E43" stroke="#267B77" stroke-width="1.2" />
+<text x="885" y="316" font-size="19" fill="#58E0CA" font-weight="800" text-anchor="middle">02</text>
+<text x="927" y="319" font-size="26" fill="#F4FAFF" font-weight="740">Gmail · alertas y respuestas</text>
+<text x="862" y="351" font-size="18" fill="#B2C9D9" font-weight="450">Nube  ·  avisos, guardadas y candidaturas</text>
+<path d="M430 375 V395 H315 V433" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1" marker-end="url(#arrow)"/>
+<path d="M1168 375 V395 H796 V433" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1" marker-end="url(#arrow)"/>
+<text x="96" y="413" font-size="16" fill="#88B3CE" font-weight="800" letter-spacing="3">B / FUENTES Y PERFIL</text>
+<path d="M96 425 H1504" fill="none" stroke="#264057" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<rect x="95" y="446" width="438" height="112" rx="18" fill="url(#panel)" stroke="#315675" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="96" y="463" width="5" height="78" rx="2.5" fill="#6EC7FF"/>
+<rect x="121" y="470" width="53" height="41" rx="11" fill="#152E43" stroke="#315675" stroke-width="1.2" />
+<text x="147" y="498" font-size="19" fill="#6EC7FF" font-weight="800" text-anchor="middle">03</text>
+<text x="189" y="501" font-size="26" fill="#F4FAFF" font-weight="740">ofertas_raw.csv</text>
+<text x="124" y="533" font-size="18" fill="#B2C9D9" font-weight="450">Origen, URL, rol y metadatos</text>
+<rect x="581" y="446" width="438" height="112" rx="18" fill="url(#panelGreen)" stroke="#267B77" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="582" y="463" width="5" height="78" rx="2.5" fill="#58E0CA"/>
+<rect x="607" y="470" width="53" height="41" rx="11" fill="#152E43" stroke="#267B77" stroke-width="1.2" />
+<text x="633" y="498" font-size="19" fill="#58E0CA" font-weight="800" text-anchor="middle">04</text>
+<text x="675" y="501" font-size="26" fill="#F4FAFF" font-weight="740">descripciones_api.json</text>
+<text x="610" y="533" font-size="18" fill="#B2C9D9" font-weight="450">Texto completo por ID</text>
+<rect x="1067" y="446" width="438" height="112" rx="18" fill="url(#panelPurple)" stroke="#505C87" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="1068" y="463" width="5" height="78" rx="2.5" fill="#B5A8FF"/>
+<rect x="1093" y="470" width="53" height="41" rx="11" fill="#152E43" stroke="#505C87" stroke-width="1.2" />
+<text x="1119" y="498" font-size="19" fill="#B5A8FF" font-weight="800" text-anchor="middle">05</text>
+<text x="1161" y="501" font-size="26" fill="#F4FAFF" font-weight="740">master_cv.md</text>
+<text x="1096" y="533" font-size="18" fill="#B2C9D9" font-weight="450">Tecnologías acreditadas</text>
+<path d="M314 558 V588 H1286" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<path d="M800 558 V588" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<path d="M1286 558 V588" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<path d="M510 588 V632" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1" marker-end="url(#arrow)"/>
+<text x="96" y="612" font-size="16" fill="#88B3CE" font-weight="800" letter-spacing="3">C / EVALUACIÓN</text>
+<path d="M96 624 H1504" fill="none" stroke="#264057" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<rect x="250" y="646" width="524" height="124" rx="18" fill="url(#panel)" stroke="#315675" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="251" y="663" width="5" height="90" rx="2.5" fill="#6EC7FF"/>
+<rect x="276" y="670" width="53" height="41" rx="11" fill="#152E43" stroke="#315675" stroke-width="1.2" />
+<text x="302" y="698" font-size="19" fill="#6EC7FF" font-weight="800" text-anchor="middle">06</text>
+<text x="344" y="701" font-size="26" fill="#F4FAFF" font-weight="740">score_radar.py</text>
+<text x="279" y="733" font-size="18" fill="#B2C9D9" font-weight="450">RAW + descripción + CV + feedback</text>
+<text x="279" y="756" font-size="17" fill="#83ADC5" font-weight="490">Cálculo ponderado · nota nueva</text>
+<rect x="836" y="646" width="515" height="124" rx="18" fill="url(#panelAmber)" stroke="#80633D" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="837" y="663" width="5" height="90" rx="2.5" fill="#F7C479"/>
+<rect x="862" y="670" width="53" height="41" rx="11" fill="#152E43" stroke="#80633D" stroke-width="1.2" />
+<text x="888" y="698" font-size="19" fill="#F7C479" font-weight="800" text-anchor="middle">07</text>
+<text x="930" y="701" font-size="26" fill="#F4FAFF" font-weight="740">Puntuación y reglas</text>
+<text x="865" y="733" font-size="18" fill="#B2C9D9" font-weight="450">45 tech + 25 exp + 20 parecido + 10 título</text>
+<text x="865" y="756" font-size="17" fill="#83ADC5" font-weight="490">Salario +10 · restricciones prevalecen</text>
+<path d="M774 707 H836" fill="none" stroke="#719CB4" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="1" marker-end="url(#arrow)"/>
+<path d="M1094 770 V794 H800" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+<path d="M315 794 H1286" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+<path d="M314 794 V824" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.94" marker-end="url(#arrow)"/>
+<path d="M800 794 V824" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.94" marker-end="url(#arrow)"/>
+<path d="M1286 794 V824" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.94" marker-end="url(#arrow)"/>
+<text x="96" y="808" font-size="16" fill="#88B3CE" font-weight="800" letter-spacing="3">D / RESULTADO DE LAS REGLAS</text>
+<path d="M96 820 H1504" fill="none" stroke="#264057" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<rect x="95" y="837" width="439" height="71" rx="14" fill="url(#lead)" stroke="#318374" stroke-width="1.5" />
+<text x="314" y="869" font-size="25" fill="#72EFC3" font-weight="900" letter-spacing="1.7" text-anchor="middle">LEAD</text>
+<text x="314" y="894" font-size="17" fill="#C6CFD7" font-weight="530" text-anchor="middle">60+ y restricciones superadas</text>
+<rect x="581" y="837" width="439" height="71" rx="14" fill="url(#review)" stroke="#987641" stroke-width="1.5" />
+<text x="800" y="869" font-size="25" fill="#FFCF91" font-weight="900" letter-spacing="1.7" text-anchor="middle">REVISAR</text>
+<text x="800" y="894" font-size="17" fill="#C6CFD7" font-weight="530" text-anchor="middle">35–59 o encaje parcial</text>
+<rect x="1067" y="837" width="439" height="71" rx="14" fill="url(#reject)" stroke="#8D515D" stroke-width="1.5" />
+<text x="1286" y="869" font-size="25" fill="#FFA8B2" font-weight="900" letter-spacing="1.7" text-anchor="middle">DESCARTAR</text>
+<text x="1286" y="894" font-size="17" fill="#C6CFD7" font-weight="530" text-anchor="middle">&lt; 35 o descarte obligatorio</text>
+<path d="M314 908 V931" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<path d="M800 908 V931" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<path d="M1286 908 V931" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<path d="M314 931 H1286" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<path d="M504 931 V967" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1" marker-end="url(#arrow)"/>
+<path d="M1096 931 V967" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1" marker-end="url(#arrow)"/>
+<text x="96" y="948" font-size="16" fill="#88B3CE" font-weight="800" letter-spacing="3">E / SALIDAS</text>
+<path d="M96 960 H1504" fill="none" stroke="#264057" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<rect x="235" y="981" width="535" height="108" rx="18" fill="url(#panelGreen)" stroke="#267B77" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="236" y="998" width="5" height="74" rx="2.5" fill="#57DFC6"/>
+<rect x="261" y="1005" width="53" height="41" rx="11" fill="#152E43" stroke="#267B77" stroke-width="1.2" />
+<text x="287" y="1033" font-size="19" fill="#57DFC6" font-weight="800" text-anchor="middle">08</text>
+<text x="329" y="1036" font-size="26" fill="#F4FAFF" font-weight="740">radar.csv + radar.md</text>
+<text x="264" y="1068" font-size="18" fill="#B2C9D9" font-weight="450">19 columnas · ranking y decisiones</text>
+<rect x="832" y="981" width="535" height="108" rx="18" fill="url(#panelGreen)" stroke="#267B77" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="833" y="998" width="5" height="74" rx="2.5" fill="#57DFC6"/>
+<rect x="858" y="1005" width="53" height="41" rx="11" fill="#152E43" stroke="#267B77" stroke-width="1.2" />
+<text x="884" y="1033" font-size="19" fill="#57DFC6" font-weight="800" text-anchor="middle">09</text>
+<text x="926" y="1036" font-size="26" fill="#F4FAFF" font-weight="740">metricas.md</text>
+<text x="861" y="1068" font-size="18" fill="#B2C9D9" font-weight="450">Calidad · lotes · indicadores</text>
+<path d="M503 1089 V1110 H1098" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+<path d="M1097 1089 V1110" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+<path d="M800 1110 V1140" fill="none" stroke="#4C738E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1" marker-end="url(#arrow)"/>
+<text x="96" y="1125" font-size="16" fill="#88B3CE" font-weight="800" letter-spacing="3">F / REALIMENTACIÓN HUMANA</text>
+<path d="M96 1137 H1504" fill="none" stroke="#264057" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<rect x="367" y="1155" width="866" height="90" rx="18" fill="url(#panelPurple)" stroke="#505C87" stroke-width="1.6" filter="url(#shadow)"/>
+<rect x="368" y="1172" width="5" height="56" rx="2.5" fill="#B6A6FF"/>
+<rect x="393" y="1179" width="53" height="41" rx="11" fill="#152E43" stroke="#505C87" stroke-width="1.2" />
+<text x="419" y="1207" font-size="19" fill="#B6A6FF" font-weight="800" text-anchor="middle">10</text>
+<text x="461" y="1210" font-size="26" fill="#F4FAFF" font-weight="740">Tu decisión · siguiente pasada</text>
+<text x="396" y="1242" font-size="18" fill="#B2C9D9" font-weight="450">ok / razon · nueva pasada  ·  candidaturas · pipeline.csv</text>
+<text x="97" y="1265" font-size="15" fill="#809FB6" font-weight="720" letter-spacing="1.2">DOCUMENTACIÓN ESTÁTICA · SVG APTO PARA GITHUB README</text>
+<text x="1503" y="1265" font-size="15" fill="#809FB6" font-weight="720" letter-spacing="1.0" text-anchor="end">FUENTE: DOCUMENTACIÓN DEL PROYECTO</text>
+</svg>

@@ -1,0 +1,4 @@
+clientes/ID*/
+__pycache__/
+*.py[cod]
+.venv/

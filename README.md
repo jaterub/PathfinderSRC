@@ -68,3 +68,27 @@
 La captación Python está preparada para 12:00, 12:20 y 12:40 (Europe/Madrid) y el motor Radar se consolida a partir de las 13:00. El horario real de la tarea externa de Claude **debe configurarse y probarse allí**; el repositorio por sí solo no lo activa. La tarea hace push tras validar. Guía: `evidencias/P0.12-claude-python-operacion.md`. El plan general está en `CONTEXTO.md`.
 
 **Trazabilidad:** RAW y `1_panel/radar.csv` incluyen la columna `origen`: `email`, `API` o `email+API` para las ofertas procesadas por ambas fuentes. La columna nueva aparece al ejecutar de nuevo los scripts de importación y puntuación; los CSV antiguos no se modifican solo por cambiar el código.
+
+## Estructura pública del producto
+
+El código extraído de la aplicación está organizado así:
+
+| Ruta | Contenido |
+|---|---|
+| [motor/](./motor/) | Generador del dashboard y mapa de la extracción pendiente |
+| [interfaz/](./interfaz/) | Plantilla HTML/CSS/JavaScript del dashboard v4, sin datos incrustados |
+| [clientes/demo-01/](./clientes/demo-01/) | CV de demostración sin identificadores directos y alcance del ejemplo |
+| [pruebas/](./pruebas/) | Privacidad del CV y de las rutas de clientes, escape del JSON y render independiente |
+| [Contrato técnico](./docs/contrato.md) | Entradas, salidas, privacidad y criterios de extracción |
+| [Ingeniería inversa de v4](./docs/ingenieria-inversa-v4.md) | Flujo, dependencias y nota de flexibilidad por cliente |
+| [.github/workflows/ci.yml](./.github/workflows/ci.yml) | Pruebas públicas con Python 3.12 |
+
+**Estado:** plantilla y render extraídos; puntuación completa, aplicación del perfil y configuración de búsquedas y alertas todavía pendientes. El mapa de Documenter describe el prototipo de origen; sus rutas de datos y código no implican que toda la aplicación esté ya migrada.
+
+Para ejecutar las comprobaciones desde la raíz del repositorio:
+
+```sh
+python -m unittest discover -s pruebas -p "test_*.py" -v
+```
+
+Los datos de clientes reales permanecen privados. `clientes/ID*/` está ignorado y prohibido en el índice Git por la comprobación de privacidad.

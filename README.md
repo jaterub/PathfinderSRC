@@ -1,8 +1,8 @@
 # TrackRadar
 
-[![Documenter · Del anuncio al Radar: mapa visual de las diez etapas](./docs/documenter/portada-radar.svg)](https://jaterub.github.io/Pathfinder/)
+[![Documenter · Del anuncio al Radar: mapa visual de las diez etapas](./docs/documenter/portada-radar.svg)](https://jaterub.github.io/PathfinderSRC/documenter/flujo-radar.html)
 
-**Documenter:** mapa de captación, evaluación y decisiones. [Explorar el HTML interactivo](./docs/documenter/flujo-radar.html) (descargar y abrir en el navegador; publicación web pendiente) · [Ver código del motor](./2_motor/radar/score_radar.py).
+**Documenter:** mapa de captación, evaluación y decisiones. [Explorar el HTML interactivo](https://jaterub.github.io/PathfinderSRC/documenter/flujo-radar.html) · [Ver código del motor](./2_motor/radar/score_radar.py).
 
 ## Documenter · recorrido explicado
 
@@ -18,10 +18,10 @@
 <tr><td>4 · Panel</td><td><code>radar.csv</code> + <code>metricas.md</code></td><td>Lead / revisar / descartar y tus decisiones <code>ok</code> / <code>razon</code></td></tr>
 </tbody>
 </table>
-<p><strong>Prototipo completo:</strong> <a href="./docs/documenter/flujo-radar.html">HTML interactivo de Documenter</a> · <a href="./docs/documenter/retrospectiva.xml">Retrospectiva XML</a>.</p>
+<p><strong>Prototipo completo:</strong> <a href="https://jaterub.github.io/PathfinderSRC/documenter/flujo-radar.html">HTML interactivo de Documenter</a> · <a href="./docs/documenter/retrospectiva.xml">Retrospectiva XML</a>.</p>
 </details>
 
-> **Alcance de la prueba:** GitHub renderiza el HTML básico del README (tabla y desplegable), pero no ejecuta su CSS ni JavaScript interactivo. El archivo `.html` está conservado completo en el repositorio; para verlo como página interactiva será necesario abrirlo fuera del visor de código o publicarlo con GitHub Pages. No hay agente Documenter activado.
+> **Alcance de la prueba:** GitHub renderiza el HTML básico del README (tabla y desplegable), pero no ejecuta su CSS ni JavaScript interactivo. La versión interactiva del HTML se abre en GitHub Pages. No hay agente Documenter activado.
 
 
 > Aquí encontrarás dónde está cada cosa. Las carpetas van por **quién las usa**: tú, la máquina que ejecuta o la máquina que guarda.

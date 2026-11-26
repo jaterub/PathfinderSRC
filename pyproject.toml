@@ -3,8 +3,11 @@ name = "pathfindersrc"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.20.1",
     "fastapi>=0.165.0",
+    "psycopg[binary]>=3.3.9",
     "pydantic>=2,<3",
+    "sqlmodel>=0.0.50",
     "uvicorn>=0.54.0",
 ]
 

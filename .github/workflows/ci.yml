@@ -11,6 +11,21 @@ jobs:
   privacidad:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: pathfinder
+          POSTGRES_DB: pathfinder_test
+          POSTGRES_PASSWORD: pathfinder_ci_test_only
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U pathfinder -d pathfinder_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,4 +41,7 @@ jobs:
         run: uv sync --locked
 
       - name: Run tests
+        env:
+          PATHFINDER_TEST_DB: "1"
+          POSTGRES_PASSWORD: pathfinder_ci_test_only
         run: uv run --locked python -m pytest pruebas -v

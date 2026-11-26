@@ -26,4 +26,4 @@ jobs:
         run: uv sync --locked
 
       - name: Run tests
-        run: uv run --locked pytest pruebas -v
+        run: uv run --locked python -m pytest pruebas -v

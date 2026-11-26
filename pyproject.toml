@@ -3,10 +3,13 @@ name = "pathfindersrc"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
+    "fastapi>=0.165.0",
     "pydantic>=2,<3",
+    "uvicorn>=0.54.0",
 ]
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.0.0",
     "pytest>=9.2.0",
 ]

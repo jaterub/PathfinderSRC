@@ -48,6 +48,14 @@ FIELDS = """query($id:ID!,$cursor:String) {
     }
   } }
 }"""
+WORKFLOWS = """query($id:ID!,$cursor:String) {
+  node(id:$id) { ... on ProjectV2 { id title
+    workflows(first:100,after:$cursor) {
+      pageInfo { hasNextPage endCursor }
+      nodes { name enabled }
+    }
+  } }
+}"""
 ITEMS = """query($id:ID!,$cursor:String) {
   node(id:$id) { ... on ProjectV2 { id title
     items(first:100,after:$cursor,archivedStates:[ARCHIVED,NOT_ARCHIVED]) {
@@ -138,8 +146,17 @@ class GitHub:
         if self.repo.casefold() not in {(r.get("nameWithOwner") or "").casefold() for r in linked if r}:
             raise ValueError("Project is not linked to the configured repository")
 
+    def sub_issue_auto_add_enabled(self):
+        workflows = self.project_pages(WORKFLOWS, "workflows")
+        if any(not isinstance(w, dict) or not isinstance(w.get("name"), str)
+               or type(w.get("enabled")) is not bool for w in workflows):
+            raise ValueError("Project workflow names or enabled state are unreadable")
+        return any(w["enabled"] and w["name"].strip().casefold() == "auto-add sub-issues to project"
+                   for w in workflows)
+
     def board(self):
         self.verify_scope()
+        auto_add = self.sub_issue_auto_add_enabled()
         fields = [f for f in self.project_pages(FIELDS, "fields")
                   if f and f.get("name") == "Status" and f.get("options")]
         if len(fields) != 1 or not fields[0].get("id"):
@@ -167,7 +184,8 @@ class GitHub:
                           "number": content.get("number"), "content_id": content.get("id"),
                           "status": status[0] if status else None})
         self.field_id, self.options = field["id"], options
-        return {"field": field["id"], "options": options, "cards": sorted(cards, key=lambda c: c["id"])}
+        return {"field": field["id"], "options": options, "cards": sorted(cards, key=lambda c: c["id"]),
+                "auto_add_sub_issues": auto_add}
 
     def same_repo(self, item):
         expected = f"{API}/repos/{self.repo}".casefold()

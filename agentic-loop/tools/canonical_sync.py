@@ -12,6 +12,9 @@ from canonical_config import authorize_apply, load_config
 from canonical_plan import build_plan, desired_nodes, index_issues
 from guard_issue_closure import closure_verdict
 
+AUTO_ADD_BLOCKER = ("Project workflow 'Auto-add sub-issues to project' is enabled. "
+                    "Turn it off in Project Workflows and generate a fresh plan before apply.")
+
 
 def digest(value):
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
@@ -46,6 +49,7 @@ def public_snapshot(snapshot, config):
     return {"sha256": digest(snapshot), "issues": issues, "parents": snapshot["parents"],
             "children": snapshot["children"], "cards": canonical,
             "field": snapshot["board"]["field"], "options": snapshot["board"]["options"],
+            "auto_add_sub_issues": snapshot["board"]["auto_add_sub_issues"],
             "unrelated_cards": len(other), "unrelated_sha256": digest(other)}
 
 
@@ -57,12 +61,18 @@ def synchronize(api, parents, config, out, *, apply=False, sleep=time.sleep):
     actions, indexed = build_plan(nodes, before, config)
     backup = public_snapshot(before, config)
     save(out / "snapshot.json", backup)
-    save(out / "plan.json", {"apply": apply, "snapshot_sha256": backup["sha256"], "actions": actions})
+    blockers = [AUTO_ADD_BLOCKER] if backup["auto_add_sub_issues"] else []
+    save(out / "plan.json", {"apply": apply, "snapshot_sha256": backup["sha256"],
+                             "actions": actions, "blockers": blockers})
     print(f"PLAN: {len(actions)} changes; {'apply' if apply else 'read-only'}", flush=True)
     journal = []
     save(out / "journal.json", journal)
+    for blocker in blockers:
+        print(f"BLOCKED APPLY: {blocker}", flush=True)
     if not apply:
         return actions
+    if blockers:
+        raise RuntimeError(AUTO_ADD_BLOCKER)
     # Fail closed if someone changed an Issue or card since preflight.
     fresh = api.snapshot()
     if digest(fresh) != digest(before):
@@ -79,6 +89,9 @@ def synchronize(api, parents, config, out, *, apply=False, sleep=time.sleep):
     for attempt in range(3):
         after = api.snapshot()
         remaining, _ = build_plan(nodes, after, config)
+        if after["board"]["auto_add_sub_issues"]:
+            save(out / "remaining.json", remaining)
+            raise RuntimeError(AUTO_ADD_BLOCKER)
         if not remaining:
             verified = public_snapshot(after, config)
             indexed, numbers = index_issues(after["issues"], config)
@@ -95,6 +108,10 @@ def synchronize(api, parents, config, out, *, apply=False, sleep=time.sleep):
         if attempt < 2:
             sleep(2)
     save(out / "remaining.json", remaining)
+    if all(a["kind"] == "archive" and a["id"] in nodes and nodes[a["id"]]["parent"] is not None
+           for a in remaining):
+        raise RuntimeError("post-write drift: unexpected active sub-issue cards; inspect remaining.json, "
+                           "check Project auto-add workflows, and generate a fresh plan before apply")
     raise RuntimeError("post-write verification detected drift; inspect journal and rerun")
 
 

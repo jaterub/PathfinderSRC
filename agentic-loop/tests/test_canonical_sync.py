@@ -30,6 +30,16 @@ CHECK = """## Check canónico
   B. ☐ P9.B Later
     1. ☐ P9.2 Wait
 """
+PILOT_SHAPE = """## Check canónico
+* ✅ P1. First phase
+  1. ✅ P1.1 First task
+* ⏳ P2. Second phase
+  1. ✅ P2.1 Work 1
+  2. ✅ P2.2 Work 2
+  3. ✅ P2.3 Work 3
+  4. ☐ P2.4 Work 4
+  5. ☐ P2.5 Work 5
+"""
 
 
 class FakeGitHub:
@@ -40,6 +50,7 @@ class FakeGitHub:
         self.parents = {}
         self.children = {}
         self.board = {"field": "field", "options": {"backlog": "b", "in progress": "i", "done": "d"},
+                      "auto_add_sub_issues": False,
                       "cards": [{"id": "unrelated", "repository": "other/client", "number": 6,
                                  "archived": False, "status": "Done", "content_id": "other"}]}
         self.writes = []
@@ -122,6 +133,56 @@ class SyncTests(unittest.TestCase):
         backup = (self.out / "snapshot.json").read_text()
         self.assertNotIn("other/client", backup)
         self.assertIn("unrelated_sha256", backup)
+
+    def test_pilot_shape_enabled_auto_add_blocks_all_writes(self):
+        parents = parse_canonical(PILOT_SHAPE, section=CONFIG["section"])
+        self.api.board["auto_add_sub_issues"] = True
+        plan = self.run_sync(parents=parents)
+        self.assertEqual(len(plan), 23)
+        self.assertEqual([a["id"] for a in plan if a["kind"] == "add_card"], ["P1", "P2"])
+        self.assertIn("Auto-add sub-issues to project",
+                      json.loads((self.out / "plan.json").read_text(encoding="utf-8"))["blockers"][0])
+        with self.assertRaisesRegex(RuntimeError, "Turn it off"):
+            self.run_sync(True, parents=parents)
+        self.assertEqual(self.api.writes, [])
+        self.assertEqual(json.loads((self.out / "journal.json").read_text(encoding="utf-8")), [])
+        self.api.board["auto_add_sub_issues"] = False
+        self.assertEqual(len(self.run_sync(True, parents=parents)), 23)
+        self.assertEqual(self.run_sync(parents=parents), [])
+
+    def test_pilot_shape_unreported_auto_add_drift_and_archive_only_recovery(self):
+        parents = parse_canonical(PILOT_SHAPE, section=CONFIG["section"])
+        execute = self.api.execute
+
+        def execute_with_native_auto_add(action, indexed):
+            execute(action, indexed)
+            if action["kind"] == "add_card":
+                for number in self.api.children[indexed[action["id"]]["number"]]:
+                    self.api.board["cards"].append({"id": f"C{number}", "repository": CONFIG["repository"],
+                        "number": number, "archived": False, "status": "Backlog", "content_id": f"I{number}"})
+
+        self.api.execute = execute_with_native_auto_add
+        with self.assertRaisesRegex(RuntimeError, "unexpected active sub-issue cards"):
+            self.run_sync(True, parents=parents)
+        journal = json.loads((self.out / "journal.json").read_text(encoding="utf-8"))
+        remaining = json.loads((self.out / "remaining.json").read_text(encoding="utf-8"))
+        self.assertEqual([e["state"] for e in journal], ["completed"] * 23)
+        self.assertEqual(len(self.api.issues), 8)
+        self.assertEqual(sum(c["repository"] == CONFIG["repository"] for c in self.api.board["cards"]), 8)
+        self.assertEqual({(a["kind"], a["id"]) for a in remaining},
+                         {("archive", key) for key in ("P1.1", "P2.1", "P2.2", "P2.3", "P2.4", "P2.5")})
+        self.api.execute = execute
+        before = self.api.snapshot()
+        self.assertEqual(self.run_sync(parents=parents), remaining)
+        self.assertEqual(self.run_sync(True, parents=parents), remaining)
+        self.assertEqual(self.run_sync(parents=parents), [])
+        after = self.api.snapshot()
+        for key in ("issues", "parents", "children"):
+            self.assertEqual(after[key], before[key])
+        self.assertEqual([c for c in after["board"]["cards"] if c["id"] == "unrelated"],
+                         [c for c in before["board"]["cards"] if c["id"] == "unrelated"])
+        self.assertEqual(sum(c["repository"] == CONFIG["repository"] and not c["archived"]
+                             for c in after["board"]["cards"]), 2)
 
     def test_03_incremental_rename_and_no_overwrite_of_body(self):
         self.run_sync(True)
@@ -340,6 +401,26 @@ class TransportTests(unittest.TestCase):
         api.config = {**CONFIG, "project_title": "Wrong"}
         with self.assertRaisesRegex(ValueError, "identity/title"):
             api.project_pages("query { node }", "items")
+
+    def test_native_auto_add_uses_read_only_paginated_workflow_state(self):
+        seen = []
+        active = True
+
+        def transport(method, url, token, payload, allow_404):
+            self.assertTrue(payload["query"].lstrip().startswith("query"))
+            self.assertEqual(token, "project")
+            cursor = payload["variables"]["cursor"]
+            seen.append(cursor)
+            workflow = {"name": "Item closed", "enabled": True} if cursor is None else {
+                "name": "Auto-add sub-issues to project", "enabled": active}
+            return {"data": {"node": {"id": CONFIG["project_id"], "title": CONFIG["project_title"],
+                "workflows": {"nodes": [workflow], "pageInfo": {"hasNextPage": cursor is None,
+                                                               "endCursor": "next"}}}}}
+        api = GitHub(CONFIG, "issue", "project", transport=transport)
+        self.assertTrue(api.sub_issue_auto_add_enabled())
+        active = False
+        self.assertFalse(api.sub_issue_auto_add_enabled())
+        self.assertEqual(seen, [None, "next", None, "next"])
 
 class BackupTests(unittest.TestCase):
     def capture(self, *, unknown=False, wrong_title=False, repeated_cursor=False):

@@ -88,10 +88,18 @@ class TestWorkflowSafety(unittest.TestCase):
         for name in ("sync-blueprint-all.yml", "sync-blueprint-parent-project.yml", "guard-canonical-closures.yml"):
             source = (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
             self.assertIn("group: canonical-kanban", source)
-            self.assertIn("refs/heads/main", source)
-            self.assertIn("vars.CANONICAL_SYNC_ENABLED", source)
             self.assertNotIn("pull_request:", source)
             self.assertNotIn("jaterub/", source)
+            if name == "sync-blueprint-all.yml" and "refs/heads/chore/pr21-kanban-plan-only" in source:
+                self.assertIn("inputs.mode == 'plan'", source)
+                self.assertIn("canonical_sync.py --mode plan", source)
+                self.assertNotIn("issues: write", source)
+                self.assertNotIn("--mode apply", source)
+                self.assertNotIn("\n  reconcile:", source)
+                self.assertNotIn("\n  push:", source)
+            else:
+                self.assertIn("refs/heads/main", source)
+                self.assertIn("vars.CANONICAL_SYNC_ENABLED", source)
         test = (ROOT / ".github/workflows/check-hierarchy-tests.yml").read_text(encoding="utf-8")
         self.assertNotIn("issues: write", test)
         self.assertIn("test_canonical_sync.py", test)

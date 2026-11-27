@@ -1,23 +1,17 @@
 name: Sync canonical check (bootstrap and incremental)
 on:
-  push:
-    branches: [main]
-    paths:
-      - CONTEXTO.md
-      - .github/canonical-check.json
-      - agentic-loop/tools/**
-      - agentic-loop/tests/**
-      - .github/workflows/sync-blueprint-all.yml
   workflow_dispatch:
     inputs:
       mode:
-        description: Read-only plan or approved synchronization
+        description: PR 21 validation (read-only)
         type: choice
+        required: true
         default: plan
-        options: [plan, apply]
+        options: [plan]
 
 permissions:
   contents: read
+  issues: read
 
 concurrency:
   group: canonical-kanban
@@ -25,65 +19,48 @@ concurrency:
 
 jobs:
   plan:
-    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.mode == 'plan' }}
-    permissions:
-      contents: read
-      issues: read
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/chore/pr21-kanban-plan-only' && inputs.mode == 'plan' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      GH_TOKEN: ${{ github.token }}
-      PROJECTS_TOKEN: ${{ secrets.CANONICAL_PROJECTS_READ_TOKEN || secrets.CANONICAL_PROJECTS_TOKEN }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-          ref: main
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Read-only plan
-        run: python agentic-loop/tools/canonical_sync.py --mode plan
-      - name: Preserve redacted plan and snapshot
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: canonical-kanban-plan-${{ github.run_id }}
-          path: ${{ runner.temp }}/canonical-kanban/
-          retention-days: 7
-          if-no-files-found: ignore
-
-  reconcile:
-    if: ${{ github.ref == 'refs/heads/main' && vars.CANONICAL_SYNC_ENABLED == 'true' && (github.event_name == 'push' || inputs.mode == 'apply') }}
-    permissions:
-      contents: read
-      issues: write
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      GH_TOKEN: ${{ github.token }}
-      PROJECTS_TOKEN: ${{ secrets.CANONICAL_PROJECTS_TOKEN }}
-      CANONICAL_SYNC_ENABLED: ${{ vars.CANONICAL_SYNC_ENABLED }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          ref: main
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Validate the installed canonical engine before writes
+      - name: Verify PR 21 blobs
         run: |
-          python -m unittest discover -s agentic-loop/tests -p "test_blueprint*.py" -v
-          python -m unittest discover -s agentic-loop/tests -p "test_guard_issue_closure.py" -v
-          python -m unittest discover -s agentic-loop/tests -p "test_canonical_sync.py" -v
-      - name: Reconcile canonical Issues and Kanban
-        run: python agentic-loop/tools/canonical_sync.py --mode apply
-      - name: Preserve redacted plan, snapshot and operation journal
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: canonical-kanban-${{ github.run_id }}
-          path: ${{ runner.temp }}/canonical-kanban/
-          retention-days: 7
-          if-no-files-found: ignore
+          test "$(git hash-object agentic-loop/tools/canonical_github.py)" = 'ec9348f3625faeb349aed6541b39249a7b91b6b0'
+          test "$(git hash-object agentic-loop/tools/canonical_sync.py)" = '50ce5d3677b321a5a63daf669e9907d2d31298c1'
+          test "$(git hash-object agentic-loop/tests/test_canonical_sync.py)" = '2fcffd6bd7455b99726227c80a62b146f2254f68'
+      - name: Read-only plan with the pilot credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROJECTS_TOKEN: ${{ secrets.CANONICAL_PROJECTS_READ_TOKEN || secrets.CANONICAL_PROJECTS_TOKEN }}
+        run: python agentic-loop/tools/canonical_sync.py --mode plan
+      - name: Verify and summarize evidence without case data
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from collections import Counter
+          from pathlib import Path
+
+          out = Path(os.environ["RUNNER_TEMP"]) / "canonical-kanban"
+          read = lambda name: json.loads((out / name).read_text(encoding="utf-8"))
+          plan = read("plan.json")
+          snapshot = read("snapshot.json")
+          assert plan["apply"] is False and read("journal.json") == []
+          enabled = snapshot["auto_add_sub_issues"]
+          assert type(enabled) is bool and bool(plan["blockers"]) == enabled
+          print(json.dumps({
+              "auto_add_sub_issues": enabled,
+              "blocked_apply": bool(plan["blockers"]),
+              "issues": len(snapshot["issues"]),
+              "active_cards": sum(not card["archived"] for card in snapshot["cards"]),
+              "operations": dict(Counter(action["kind"] for action in plan["actions"])),
+              "journal_entries": 0,
+          }, sort_keys=True))
+          PY

@@ -1,0 +1,89 @@
+name: Sync canonical check (bootstrap and incremental)
+on:
+  push:
+    branches: [main]
+    paths:
+      - CONTEXTO.md
+      - .github/canonical-check.json
+      - agentic-loop/tools/**
+      - agentic-loop/tests/**
+      - .github/workflows/sync-blueprint-all.yml
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Read-only plan or approved synchronization
+        type: choice
+        default: plan
+        options: [plan, apply]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canonical-kanban
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.mode == 'plan' }}
+    permissions:
+      contents: read
+      issues: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PROJECTS_TOKEN: ${{ secrets.CANONICAL_PROJECTS_READ_TOKEN || secrets.CANONICAL_PROJECTS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read-only plan
+        run: python agentic-loop/tools/canonical_sync.py --mode plan
+      - name: Preserve redacted plan and snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-kanban-plan-${{ github.run_id }}
+          path: ${{ runner.temp }}/canonical-kanban/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  reconcile:
+    if: ${{ github.ref == 'refs/heads/main' && vars.CANONICAL_SYNC_ENABLED == 'true' && (github.event_name == 'push' || inputs.mode == 'apply') }}
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PROJECTS_TOKEN: ${{ secrets.CANONICAL_PROJECTS_TOKEN }}
+      CANONICAL_SYNC_ENABLED: ${{ vars.CANONICAL_SYNC_ENABLED }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate the installed canonical engine before writes
+        run: |
+          python -m unittest discover -s agentic-loop/tests -p "test_blueprint*.py" -v
+          python -m unittest discover -s agentic-loop/tests -p "test_guard_issue_closure.py" -v
+          python -m unittest discover -s agentic-loop/tests -p "test_canonical_sync.py" -v
+      - name: Reconcile canonical Issues and Kanban
+        run: python agentic-loop/tools/canonical_sync.py --mode apply
+      - name: Preserve redacted plan, snapshot and operation journal
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-kanban-${{ github.run_id }}
+          path: ${{ runner.temp }}/canonical-kanban/
+          retention-days: 7
+          if-no-files-found: ignore

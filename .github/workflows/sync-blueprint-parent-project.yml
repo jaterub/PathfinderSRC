@@ -1,0 +1,39 @@
+name: Reconcile canonical native sub-issues
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  reconcile:
+    if: ${{ github.ref == 'refs/heads/main' && vars.CANONICAL_SYNC_ENABLED == 'true' && contains(github.event.issue.body, 'CHECK-ID:') }}
+    concurrency:
+      group: canonical-kanban
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PROJECTS_TOKEN: ${{ secrets.CANONICAL_PROJECTS_TOKEN }}
+      CANONICAL_SYNC_ENABLED: ${{ vars.CANONICAL_SYNC_ENABLED }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reconcile canonical Issues and Kanban
+        run: python agentic-loop/tools/canonical_sync.py --mode apply
+      - name: Preserve redacted plan, snapshot and operation journal
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-kanban-${{ github.run_id }}
+          path: ${{ runner.temp }}/canonical-kanban/
+          retention-days: 7
+          if-no-files-found: ignore

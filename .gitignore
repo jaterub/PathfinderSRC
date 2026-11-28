@@ -2,3 +2,8 @@ clientes/ID*/
 __pycache__/
 *.py[cod]
 .venv/
+
+# Local secrets
+.env
+.env.*
+!.env.example

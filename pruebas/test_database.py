@@ -195,3 +195,78 @@ def test_transaction_rollback(migrated_engine):
 
     with Session(migrated_engine) as session:
         assert session.exec(select(User)).all() == []
+
+
+def test_authentication_flow(migrated_engine, monkeypatch):
+    import jwt
+    import secrets
+    from datetime import datetime, timedelta, timezone
+    from fastapi.testclient import TestClient
+    from sqlmodel import Session
+    from api.main import app
+    from api.database import get_session
+
+    key = secrets.token_urlsafe(32)
+    monkeypatch.setenv("JWT_SECRET", key)
+    monkeypatch.delenv("JWT_SECRET_FILE", raising=False)
+
+    def test_session():
+        with Session(migrated_engine) as session:
+            yield session
+
+    app.dependency_overrides[get_session] = test_session
+
+    try:
+        with TestClient(app) as client:
+            data = {
+                "email": "test@example.com",
+                "password": secrets.token_urlsafe(32),
+            }
+
+            weak = {**data, "password": "123456"}
+            assert client.post("/register", json=weak).status_code == 422
+
+            invalid = {**data, "email": "invalid"}
+            response = client.post("/register", json=invalid)
+            assert response.status_code == 422
+            assert data["password"] not in response.text
+
+            registered = client.post("/register", json=data)
+            assert registered.status_code == 201
+            user = registered.json()
+            assert set(user) == {"id", "email"}
+
+            assert client.post("/register", json=data).status_code == 409
+
+            wrong = client.post("/login", json=weak)
+            missing = client.post("/login", json={
+                **data, "email": "missing@example.com"
+            })
+            assert wrong.status_code == missing.status_code == 401
+            assert wrong.json() == missing.json()
+
+            login = client.post("/login", json=data)
+            assert login.status_code == 200
+            token = login.json()["access_token"]
+
+            assert client.get("/me").status_code == 401
+
+            def access(value):
+                return client.get("/me", headers={
+                    "Authorization": f"Bearer {value}"
+                })
+
+            assert access(token).status_code == 200
+            assert access(token).json() == user
+
+            parts = token.split(".")
+            parts[2] = ("A" if parts[2][0] != "A" else "B") + parts[2][1:]
+            assert access(".".join(parts)).status_code == 401
+
+            expired = jwt.encode({
+                "sub": user["id"],
+                "exp": datetime.now(timezone.utc) - timedelta(minutes=1),
+            }, key, algorithm="HS256")
+            assert access(expired).status_code == 401
+    finally:
+        app.dependency_overrides.pop(get_session, None)

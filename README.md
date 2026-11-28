@@ -127,3 +127,35 @@ Swagger: [http://localhost:8000/docs](http://localhost:8000/docs). En Docker Des
 - Entre contenedores: la API utiliza `db:5432`, no `localhost`.
 - El volumen `postgres_data` conserva los datos al recrear contenedores y con `docker compose down` sin `--volumes`. Cambiar la contraseña en `.env` no actualiza automáticamente una base ya inicializada.
 - Para un piloto desde cero sin afectar al original, usa un nombre de proyecto distinto (`-p`) y una copia temporal completa de `compose.yml` sin ambos bloques `ports`. Usa esa copia con `-f` y `--project-directory` apuntando a la raíz en **todos** los comandos. Verifica con `config` que no publica puertos (no muestres la configuración que contiene secretos). Repite el despliegue y verifica HTTP desde el interior de la API y la consulta SQL. Retira solo el piloto con `down --volumes`, su etiqueta de imagen y el YAML temporal. Nunca borres el volumen habitual.
+
+## Autenticacion
+
+- `POST /register`: registro de usuarios.
+- `POST /login`: emision de JWT.
+- `GET /me`: acceso protegido mediante Bearer Token.
+- Passwords: Argon2id y validacion con zxcvbn.
+- Caducidad JWT: 15 minutos por defecto, configurable entre 1 y 60 mediante `TOKEN_EXPIRATION_MINUTES`.
+
+### Secretos
+
+Para Docker, generar una clave independiente si el archivo no existe:
+
+    uv run --locked python -c "import secrets; from pathlib import Path; Path('.env.jwt-secret').open('x').write(secrets.token_urlsafe(32))"
+
+En desarrollo local, configurar `JWT_SECRET` en `.env` con una clave aleatoria independiente.
+
+Docker Compose monta `.env.jwt-secret` en `/run/secrets/jwt_secret`.
+Nunca publicar estos archivos ni las claves.
+
+Reconstruir la API:
+
+    docker compose up -d --build --wait api
+
+Desde Swagger, registrar un usuario, iniciar sesion, introducir el token en Authorize y ejecutar `/me`.
+
+Validacion automatizada:
+
+    uv run --locked python -m pytest pruebas -q
+
+Pendientes de produccion: HTTPS, limitacion de intentos, rotacion de claves,
+deteccion de contrasenas comprometidas y permisos restrictivos de secretos.

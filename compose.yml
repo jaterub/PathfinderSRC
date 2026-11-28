@@ -23,11 +23,19 @@ services:
             POSTGRES_USER: pathfinder
             POSTGRES_DB: pathfinder
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define password}
+            JWT_SECRET_FILE: /run/secrets/jwt_secret
+            TOKEN_EXPIRATION_MINUTES: ${TOKEN_EXPIRATION_MINUTES:-15}
         ports:
             - "127.0.0.1:8000:8000"
+        secrets:
+            - jwt_secret
         depends_on:
             db:
                 condition: service_healthy
 
 volumes:
     postgres_data:
+
+secrets:
+    jwt_secret:
+        file: ./.env.jwt-secret

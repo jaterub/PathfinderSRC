@@ -92,3 +92,38 @@ python -m unittest discover -s pruebas -p "test_*.py" -v
 ```
 
 Los datos de clientes reales permanecen privados. `clientes/ID*/` está ignorado y prohibido en el índice Git por la comprobación de privacidad.
+
+## Backend · Docker Compose
+
+Requisitos: Docker Desktop iniciado con contenedores Linux y Docker Compose con soporte para `--wait`. Ejecuta desde la raíz del repositorio.
+
+Copia `.env.example` a `.env` si todavía no existe y establece `POSTGRES_PASSWORD` con un valor privado. No publiques ni sobrescribas las credenciales existentes.
+
+### Despliegue
+
+```powershell
+docker compose build api
+docker compose up -d --wait db
+docker compose run --rm --no-deps api /app/.venv/bin/alembic upgrade head
+docker compose up -d --wait api
+```
+
+Detente si falla algún comando. Alembic aplica las migraciones explícitamente; arrancar FastAPI no crea las tablas.
+
+### Verificación
+
+```powershell
+(Invoke-WebRequest -Uri "http://127.0.0.1:8000/health" -UseBasicParsing).StatusCode
+docker compose exec -T api /app/.venv/bin/python -c "from api.database import get_engine; from sqlalchemy import text; c = get_engine().connect(); print(c.execute(text('SELECT COUNT(*) FROM users')).scalar()); c.close()"
+```
+
+Se espera HTTP 200 y un recuento de usuarios (0 en una base recién migrada). `/health` no consulta PostgreSQL: la segunda comprobación valida la conexión y la tabla.
+
+Swagger: [http://localhost:8000/docs](http://localhost:8000/docs). En Docker Desktop, consulta **Containers → Logs / Terminal** y **Volumes**. Dentro de PostgreSQL, `psql -U pathfinder -d pathfinder` y `\dt` permiten comprobar las tablas; `\q` sale.
+
+### Red y persistencia
+
+- Windows: API en `127.0.0.1:8000`, PostgreSQL en `127.0.0.1:5433`.
+- Entre contenedores: la API utiliza `db:5432`, no `localhost`.
+- El volumen `postgres_data` conserva los datos al recrear contenedores y con `docker compose down` sin `--volumes`. Cambiar la contraseña en `.env` no actualiza automáticamente una base ya inicializada.
+- Para un piloto desde cero sin afectar al original, usa un nombre de proyecto distinto (`-p`) y una copia temporal completa de `compose.yml` sin ambos bloques `ports`. Usa esa copia con `-f` y `--project-directory` apuntando a la raíz en **todos** los comandos. Verifica con `config` que no publica puertos (no muestres la configuración que contiene secretos). Repite el despliegue y verifica HTTP desde el interior de la API y la consulta SQL. Retira solo el piloto con `down --volumes`, su etiqueta de imagen y el YAML temporal. Nunca borres el volumen habitual.

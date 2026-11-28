@@ -1,4 +1,5 @@
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID
@@ -9,7 +10,9 @@ from zxcvbn import zxcvbn
 
 from api.auth_settings import settings
 
+
 password_hasher = PasswordHash.recommended()
+DUMMY_HASH = password_hasher.hash(secrets.token_urlsafe(32))
 
 MIN_LENGTH = 8
 MAX_LENGTH = 64
@@ -60,3 +63,18 @@ def create_access_token(user_id: UUID) -> str:
     return jwt.encode(
         payload, get_jwt_secret(), algorithm=TOKEN_ALGORITHM
     )
+
+def verify_access_token(token: str) -> UUID:
+    payload = jwt.decode(
+        token,
+        get_jwt_secret(),
+        algorithms=[TOKEN_ALGORITHM],
+        options={"require": ["sub", "exp"]},
+    )
+
+    return UUID(payload["sub"])
+
+
+def verify_login_password(password: str, hashed: str | None) -> bool:
+    valid = verify_password(password, hashed or DUMMY_HASH)
+    return hashed is not None and valid

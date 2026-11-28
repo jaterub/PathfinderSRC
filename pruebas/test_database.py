@@ -220,7 +220,7 @@ def test_authentication_flow(migrated_engine, monkeypatch):
         with TestClient(app) as client:
             data = {
                 "email": "test@example.com",
-                "password": "Tren-Nube-Oceano-Cactus",
+                "password": secrets.token_urlsafe(32),
             }
 
             weak = {**data, "password": "123456"}

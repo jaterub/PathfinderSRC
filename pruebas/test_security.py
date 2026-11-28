@@ -1,3 +1,5 @@
+import secrets
+
 import pytest
 
 from api.security import hash_password, verify_password
@@ -15,7 +17,7 @@ def test_reject_weak_password(password):
 
 
 def test_password_hash_and_verification():
-    password = "Tren-Nube-Oceano-Cactus"
+    password = secrets.token_urlsafe(32)
     hashed = hash_password(password)
 
     assert hashed.startswith("$argon2id$")
